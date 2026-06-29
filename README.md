@@ -33,12 +33,35 @@ whether the listener likes acoustic songs.
 
 My starting algorithm recipe is:
 
-- Add strong points when the song genre matches the user's favorite genre.
-- Add medium points when the song mood matches the user's favorite mood.
-- Add similarity points when the song's energy is close to the user's target
-  energy, instead of only rewarding high-energy songs.
-- Later, rank all songs from highest score to lowest score and return the top
-  results with reasons.
+- Add 2.0 points when the song genre matches the user's favorite genre.
+- Add 1.5 points when the song mood matches the user's favorite mood.
+- Add up to 1.0 point when the song's energy is close to the user's target
+  energy, using `1 - abs(song_energy - target_energy)`.
+- Add up to 0.75 point for valence closeness so "happy" profiles prefer brighter
+  songs and moodier profiles can prefer lower-valence songs.
+- Add 0.5 point when the acousticness level matches whether the user likes
+  acoustic songs.
+- Rank all songs from highest score to lowest score and return the top results
+  with human-readable reasons.
+
+Default taste profile for the first implementation:
+
+```python
+user_prefs = {
+    "genre": "pop",
+    "mood": "happy",
+    "energy": 0.8,
+    "valence": 0.8,
+    "likes_acoustic": False,
+}
+```
+
+Data flow sketch:
+
+```text
+CSV song catalog -> load each row -> compare every song to user_prefs
+-> calculate score and reasons -> sort by score -> print top recommendations
+```
 
 Expected bias: because this is a small catalog, the system may over-favor genres
 or moods that appear more often. It also cannot understand lyrics, culture,
@@ -56,6 +79,7 @@ listening context, or the way a person's taste changes over time.
    python -m venv .venv
    source .venv/bin/activate      # Mac or Linux
    .venv\Scripts\activate         # Windows
+   ```
 
 2. Install dependencies
 
