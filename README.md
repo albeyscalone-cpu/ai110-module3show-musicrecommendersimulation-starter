@@ -142,25 +142,64 @@ Because: energy closeness (+0.84); valence closeness (+0.73); acoustic preferenc
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
+I tested three listener profiles and one weight-shift experiment:
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+- `High-Energy Pop`: looked for bright, upbeat, non-acoustic songs.
+- `Chill Lofi`: looked for calm, acoustic, low-energy songs.
+- `Deep Intense Rock`: looked for intense, high-energy songs with darker valence.
+- `Energy-first experiment`: doubled energy weight and cut genre weight in half.
+
+```text
+High-Energy Pop (base weights)
+1. Sunrise City by Neon Echo - Score: 5.70
+2. Gym Hero by Max Pulse - Score: 4.10
+3. Rooftop Lights by Indigo Parade - Score: 3.70
+4. Desert Bloom by Maya Sol - Score: 2.08
+5. Thunder Arcade by Pixel Riot - Score: 2.07
+```
+
+```text
+Chill Lofi (base weights)
+1. Library Rain by Paper Lanterns - Score: 5.75
+2. Midnight Coding by LoRoom - Score: 5.65
+3. Focus Flow by LoRoom - Score: 4.19
+4. Spacewalk Thoughts by Orbit Bloom - Score: 3.64
+5. Quiet Pines by North Window - Score: 2.17
+```
+
+```text
+Deep Intense Rock (base weights)
+1. Storm Runner by Voltline - Score: 5.72
+2. Gym Hero by Max Pulse - Score: 3.48
+3. Garage Sparks by Voltline - Score: 2.17
+4. Subway Static by Concrete Verse - Score: 2.09
+5. Night Drive Loop by Neon Echo - Score: 2.07
+```
+
+```text
+High-Energy Pop (energy-first experiment)
+1. Sunrise City by Neon Echo - Score: 5.68
+2. Rooftop Lights by Indigo Parade - Score: 4.66
+3. Gym Hero by Max Pulse - Score: 3.97
+4. Subway Static by Concrete Verse - Score: 3.00
+5. Desert Bloom by Maya Sol - Score: 2.96
+```
+
+The experiment made the system care more about raw energy than exact genre. That
+shift pushed `Rooftop Lights` above `Gym Hero`, which felt reasonable because it
+has almost the same energy and valence as the target profile even without the
+same genre label.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+This recommender still has a tiny catalog, so one or two strong matches can
+dominate the results. It also only understands structured features like genre,
+mood, energy, valence, and acousticness, not lyrics, context, or the listener's
+real behavior over time. During testing, I also noticed that a song like `Gym
+Hero` can rank high for very different profiles because energy and mood can
+outweigh genre when the numbers line up well.
 
 ---
 

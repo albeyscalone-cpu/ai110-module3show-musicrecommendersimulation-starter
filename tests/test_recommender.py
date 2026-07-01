@@ -93,3 +93,25 @@ def test_score_song_returns_score_and_reasons():
     assert score > 0
     assert "genre match" in "; ".join(reasons)
     assert recommendations[0][0]["title"] == "Sunrise City"
+
+
+def test_custom_weights_shift_high_energy_pop_order():
+    user_prefs = {
+        "genre": "pop",
+        "mood": "happy",
+        "energy": 0.8,
+        "valence": 0.8,
+        "likes_acoustic": False,
+    }
+    songs = load_songs("data/songs.csv")
+
+    baseline = recommend_songs(user_prefs, songs, k=3)
+    experiment = recommend_songs(
+        user_prefs,
+        songs,
+        k=3,
+        weights={"genre": 1.0, "energy": 2.0},
+    )
+
+    assert baseline[1][0]["title"] == "Gym Hero"
+    assert experiment[1][0]["title"] == "Rooftop Lights"

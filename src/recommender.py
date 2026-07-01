@@ -16,6 +16,14 @@ ENERGY_WEIGHT = 1.0
 VALENCE_WEIGHT = 0.75
 ACOUSTIC_WEIGHT = 0.5
 
+DEFAULT_WEIGHTS = {
+    "genre": GENRE_WEIGHT,
+    "mood": MOOD_WEIGHT,
+    "energy": ENERGY_WEIGHT,
+    "valence": VALENCE_WEIGHT,
+    "acoustic": ACOUSTIC_WEIGHT,
+}
+
 @dataclass
 class Song:
     """
@@ -91,41 +99,54 @@ def load_songs(csv_path: str) -> List[Dict]:
             songs.append(row)
     return songs
 
-def score_song(user_prefs: Dict, song: Dict) -> Tuple[float, List[str]]:
+def score_song(
+    user_prefs: Dict,
+    song: Dict,
+    weights: Dict[str, float] | None = None,
+) -> Tuple[float, List[str]]:
     """Score one song against user preferences and explain the score."""
+    active_weights = DEFAULT_WEIGHTS.copy()
+    if weights:
+        active_weights.update(weights)
+
     score = 0.0
     reasons = []
 
     if song["genre"].lower() == user_prefs["genre"].lower():
-        score += GENRE_WEIGHT
-        reasons.append(f"genre match (+{GENRE_WEIGHT:.2f})")
+        score += active_weights["genre"]
+        reasons.append(f"genre match (+{active_weights['genre']:.2f})")
 
     if song["mood"].lower() == user_prefs["mood"].lower():
-        score += MOOD_WEIGHT
-        reasons.append(f"mood match (+{MOOD_WEIGHT:.2f})")
+        score += active_weights["mood"]
+        reasons.append(f"mood match (+{active_weights['mood']:.2f})")
 
     energy_score = max(0.0, 1 - abs(song["energy"] - user_prefs["energy"]))
-    score += energy_score * ENERGY_WEIGHT
-    reasons.append(f"energy closeness (+{energy_score * ENERGY_WEIGHT:.2f})")
+    score += energy_score * active_weights["energy"]
+    reasons.append(f"energy closeness (+{energy_score * active_weights['energy']:.2f})")
 
     target_valence = user_prefs.get("valence", 0.5)
     valence_score = max(0.0, 1 - abs(song["valence"] - target_valence))
-    score += valence_score * VALENCE_WEIGHT
-    reasons.append(f"valence closeness (+{valence_score * VALENCE_WEIGHT:.2f})")
+    score += valence_score * active_weights["valence"]
+    reasons.append(f"valence closeness (+{valence_score * active_weights['valence']:.2f})")
 
     likes_acoustic = user_prefs.get("likes_acoustic", False)
     acoustic_match = song["acousticness"] >= 0.5 if likes_acoustic else song["acousticness"] < 0.5
     if acoustic_match:
-        score += ACOUSTIC_WEIGHT
-        reasons.append(f"acoustic preference match (+{ACOUSTIC_WEIGHT:.2f})")
+        score += active_weights["acoustic"]
+        reasons.append(f"acoustic preference match (+{active_weights['acoustic']:.2f})")
 
     return round(score, 2), reasons
 
-def recommend_songs(user_prefs: Dict, songs: List[Dict], k: int = 5) -> List[Tuple[Dict, float, str]]:
+def recommend_songs(
+    user_prefs: Dict,
+    songs: List[Dict],
+    k: int = 5,
+    weights: Dict[str, float] | None = None,
+) -> List[Tuple[Dict, float, str]]:
     """Score every song and return the top k ranked recommendations."""
     scored = []
     for song in songs:
-        score, reasons = score_song(user_prefs, song)
+        score, reasons = score_song(user_prefs, song, weights=weights)
         scored.append((song, score, "; ".join(reasons)))
 
     return sorted(scored, key=lambda item: item[1], reverse=True)[:k]

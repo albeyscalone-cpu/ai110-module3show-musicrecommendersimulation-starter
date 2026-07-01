@@ -49,41 +49,39 @@ Prompts:
 
 ## 5. Strengths  
 
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
+The system works best when a listener's preferences line up clearly with the
+catalog. The `Chill Lofi` profile produced results that felt very reasonable:
+`Library Rain`, `Midnight Coding`, and `Focus Flow` all matched the expected
+genre, calmer energy range, and acoustic feel. The `Deep Intense Rock` profile
+also behaved well at the top of the list because `Storm Runner` strongly matched
+genre, mood, and energy at the same time.
 
 ---
 
 ## 6. Limitations and Bias 
 
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+This recommender can over-reward numerical similarity even when the genre is not
+especially close. For example, `Gym Hero` stayed near the top for both
+`High-Energy Pop` and `Deep Intense Rock` because its energy and mood values fit
+both profiles well enough to overcome the genre mismatch. The catalog is also
+small and uneven, so lofi and pop songs have an advantage simply because there
+are more close neighbors for those tastes. It does not consider lyrics, vocals,
+language, listening history, or context, so it can miss why two songs with
+similar numbers might feel completely different to a human listener.
 
 ---
 
 ## 7. Evaluation  
 
-How you checked whether the recommender behaved as expected. 
-
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
+I tested three profiles: `High-Energy Pop`, `Chill Lofi`, and `Deep Intense
+Rock`. I checked whether the top recommendations changed in a way that matched
+the target vibe instead of returning the same few songs every time. The most
+interesting result was that the top song usually made sense, but the second and
+third recommendations sometimes crossed genre boundaries if their energy and
+valence were close enough. I also ran a small experiment where I doubled the
+energy weight and cut the genre weight in half. That changed the `High-Energy
+Pop` ranking by moving `Rooftop Lights` above `Gym Hero`, which showed that the
+system is quite sensitive to the weight choices.
 
 ---
 
